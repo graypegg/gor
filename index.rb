@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require_relative './app'
-require_relative './server'
-require_relative './tls_context'
+require_relative './framework/app'
+require_relative './framework/controller'
+require_relative './framework/server'
+require_relative './framework/tls_context'
 
 require_relative './config/tls'
 require_relative './config/routes'

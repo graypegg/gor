@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class HomePageController < Controller
-  def respond
-    @app.connection.log_append 'HomePageController'
+  def get
+    respond_with "Did this work?"
+  end
 
-    "Did this work?"
+  def answer(question)
+    redirect_to '/'
   end
 end
