@@ -19,6 +19,12 @@ class Controller
 
   protected
 
+  def use_persistent(name)
+    raise "You must pass a symbol for a persistent name" unless name.is_a? Symbol
+
+    @app.persistent_instances.find { |instance| instance.class.name == name.to_s }
+  end
+
   def ask_for(prompt)
     ControllerResponse.new 10, prompt
   end

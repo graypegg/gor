@@ -1,16 +1,27 @@
 # frozen_string_literal: true
 
+ROBOTS_TXT = File.read('./config/robots.txt')
+
 class App
-  def initialize(connection)
+  attr_reader :persistent_instances
+
+  def initialize(connection, persistent_instances)
     raise 'Did not pass a valid connection' unless connection.is_a? Connection
     raise 'Connection is already closed' unless connection.open?
 
     @connection = connection
+    @persistent_instances = persistent_instances
   end
 
   def respond
+    return if handle_special_requests
+
     segments = split_path_by_segments @connection.request.path
-    route = segments[1]
+    begin
+      route = segments[1]
+    rescue StandardError
+      route = nil
+    end
     controller = CONTROLLERS[route]
 
     if controller
@@ -32,7 +43,7 @@ class App
         @connection.log_append "#{controller}##{get_symbol}"
         response = instance.send get_symbol.to_sym
       else
-        @connection.close_with_error
+        @connection.close_with_error 51
       end
 
       if response
@@ -42,11 +53,24 @@ class App
 
       @connection.send unless @connection.open?
     else
-      @connection.close_with_error
+      @connection.close_with_error 51
     end
   end
 
   private
+
+  def handle_special_requests
+    case @connection.request.path
+    when '/robots.txt'
+      @connection.body = (ROBOTS_TXT || '*')
+      @connection.status = 20
+      @connection.mime_type = 'text/plain'
+      @connection.send
+      return true
+    end
+
+    false
+  end
 
   def split_path_by_segments(path)
     path.match %r{/([\w-]*)/?([\w-]*)?}
