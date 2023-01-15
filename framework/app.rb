@@ -75,7 +75,7 @@ class App
 
   def segments
     begin
-      segments = split_path_by_segments @connection.request.path
+      segments = split_path_by_segments (@connection.request.path + '/')
       segments = [] unless segments.is_a? MatchData
       segments = segments.to_a.map { |segment| segment.gsub(/\W/, '') }
     rescue StandardError
