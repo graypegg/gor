@@ -13,6 +13,6 @@ class HitCounter < Persistent
     middle = "│#{content}│"
     bottom = "└#{'─' * content.length}┘"
 
-    "#{top}\n#{middle}\n#{bottom}\n"
+    "```\n#{top}\n#{middle}\n#{bottom}\n```\n"
   end
 end

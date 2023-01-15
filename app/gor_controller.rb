@@ -23,6 +23,10 @@ class GORController < Controller
       # Gemini on Rails
       So I've built out a little Ruby framework for the Gemini protocol. It's serving this site you're on now! I'll prove it, the time is #{Time.now} and the current scope is #{self.class}. (Values included in a template, how very Web1.0!) It's quite simple at the moment, with basically just controllers for responding to 'get' (no query string) and 'answer' (with query string) requests in a rails-y looking syntax.
 
+      ## Repo
+      This is the only repo currently. It's just my gemini capsule. This will change in the future with a more clean slate to start from.
+      => https://github.com/graypegg/gor github
+
       ## Internals
       .
       ├── app/
@@ -104,11 +108,13 @@ end
 
             which renders our hit counter on screen, like the following
 
-            #{generate_code_block 'Output', 'gmi', false, "
+            ```
+            #{generate_code_block 'Output', 'md', highlight, "
 # Gray's space
 
 2 hits
             "}
+            ```
 
             ## API
 

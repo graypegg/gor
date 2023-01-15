@@ -15,12 +15,6 @@ I'm a developer in Montréal. Part time red panda. I'll have to host some art on
 => /gor /gemini-on-rails
 
 
-```
-     _     o88888o
- _.-\"\"8o_o88888888D
-       \"'\"\"\"88888\"
-```
-
 #{use_persistent(:HitCounter).draw_counter}
 "
   end
