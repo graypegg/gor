@@ -61,6 +61,7 @@ class Connection
 
   def send
     return nil unless @open
+
     @connection.print to_s
     close
   end

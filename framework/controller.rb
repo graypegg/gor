@@ -25,6 +25,10 @@ class Controller
     @app.persistent_instances.find { |instance| instance.class.name == name.to_s }
   end
 
+  def current_path
+    @app.connection.request.path
+  end
+
   def ask_for(prompt)
     ControllerResponse.new 10, prompt
   end

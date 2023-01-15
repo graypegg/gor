@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-CONTROLLERS = {
+ROUTES = {
   '' => :HomePageController,
+  'gor' => :GORController,
   'guestbook' => :GuestbookController
 }

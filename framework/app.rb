@@ -3,7 +3,7 @@
 ROBOTS_TXT = File.read('./config/robots.txt')
 
 class App
-  attr_reader :persistent_instances
+  attr_reader :persistent_instances, :connection
 
   def initialize(connection, persistent_instances)
     raise 'Did not pass a valid connection' unless connection.is_a? Connection
@@ -16,41 +16,24 @@ class App
   def respond
     return if handle_special_requests
 
-    segments = split_path_by_segments @connection.request.path
-    begin
-      route = segments[1]
-    rescue StandardError
-      route = nil
-    end
-    controller = CONTROLLERS[route]
+    controller_class = requested_controller
 
-    if controller
-      instance = Kernel.const_get(controller).new self
+    if controller_class
+      action_symbol, controller_instance = find_requested_action(controller_class)
 
-      action = segments[2]
-
-      action = nil if action == ''
-
-      answer_symbol = "#{action}_answer" if action
-      answer_symbol = 'answer' unless action
-      get_symbol = "#{action}_get" if action
-      get_symbol = 'get' unless action
-
-      if @connection.input? && instance.respond_to?(answer_symbol.to_sym)
-        @connection.log_append "#{controller}##{answer_symbol}"
-        response = instance.send answer_symbol.to_sym, @connection.input
-      elsif !@connection.input? && instance.respond_to?(get_symbol.to_sym)
-        @connection.log_append "#{controller}##{get_symbol}"
-        response = instance.send get_symbol.to_sym
+      if action_symbol
+        @connection.log_append "#{controller_class}##{action_symbol}"
+        action_method = controller_instance.method(action_symbol)
+        response = controller_instance.send action_symbol, @connection.input if action_method.arity == 1
+        response = controller_instance.send action_symbol if action_method.arity.zero?
       else
         @connection.close_with_error 51
       end
+    end
 
-      if response
-        @connection.status = response.status
-        @connection.body = response.body
-      end
-
+    if response
+      @connection.status = response.status
+      @connection.body = response.body
       @connection.send unless @connection.open?
     else
       @connection.close_with_error 51
@@ -58,6 +41,51 @@ class App
   end
 
   private
+
+  def find_requested_action(controller)
+    controller_instance = controller.new self
+
+    action_segment = segments[:action]
+    action_segment = nil if action_segment == ''
+
+    answer_method_name = "#{action_segment}_answer" if action_segment
+    answer_method_name = 'answer' unless action_segment
+    get_method_name = "#{action_segment}_get" if action_segment
+    get_method_name = 'get' unless action_segment
+
+    is_answer_request = @connection.input? && controller_instance.respond_to?(answer_method_name.to_sym)
+    is_get_request = !@connection.input? && controller_instance.respond_to?(get_method_name.to_sym)
+
+    action_symbol = if is_answer_request
+                      answer_method_name.to_sym
+                    elsif is_get_request
+                      get_method_name.to_sym
+                    end
+    [action_symbol, controller_instance]
+  end
+
+  def requested_controller
+    begin
+      route = segments[:controller]
+    rescue StandardError
+      route = nil
+    end
+    CONTROLLERS[route]
+  end
+
+  def segments
+    begin
+      segments = split_path_by_segments @connection.request.path
+      segments = [] unless segments.is_a? MatchData
+      segments = segments.to_a.map { |segment| segment.gsub(/\W/, '') }
+    rescue StandardError
+      segments = []
+    end
+    {
+      controller: segments[1] || nil,
+      action: segments[2] || nil
+    }
+  end
 
   def handle_special_requests
     case @connection.request.path
