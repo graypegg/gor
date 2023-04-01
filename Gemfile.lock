@@ -1,0 +1,44 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (7.0.4.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    concurrent-ruby (1.2.2)
+    graphql (2.0.20)
+    graphql-client (0.18.0)
+      activesupport (>= 3.0)
+      graphql
+    html_to_plain_text (1.0.5)
+      nokogiri (>= 1.4.0)
+    i18n (1.12.0)
+      concurrent-ruby (~> 1.0)
+    minitest (5.18.0)
+    nokogiri (1.14.2-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.14.2-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.14.2-x86_64-linux)
+      racc (~> 1.4)
+    racc (1.6.2)
+    rainbow (3.1.1)
+    rouge (4.0.0)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+
+PLATFORMS
+  arm64-darwin-22
+  x86_64-darwin-21
+  x86_64-linux
+
+DEPENDENCIES
+  graphql-client
+  html_to_plain_text
+  nokogiri
+  rainbow
+  rouge
+
+BUNDLED WITH
+   2.3.11
